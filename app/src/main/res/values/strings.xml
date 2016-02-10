@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">KadecotOAuthAndroidSample</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_callback_recv">CallbackRecvActivity</string>
+</resources>
