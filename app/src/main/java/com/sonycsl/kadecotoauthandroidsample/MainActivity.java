@@ -14,16 +14,19 @@ import android.widget.Button;
 
 import com.sonycsl.wamp.message.WampMessage;
 import com.sonycsl.wamp.message.WampMessageFactory;
-import com.sonycsl.wamp.transport.ProxyPeer;
+import com.sonycsl.wamp.message.WampMessageType;
+import com.sonycsl.wamp.message.WampResultMessage;
 import com.sonycsl.wamp.transport.WampWebSocketTransport;
+import com.sonycsl.wamp.util.WampRequestIdGenerator;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
     private String mToken;
     private WampWebSocketTransport mWampTransport;
-    ProxyPeer mWampProxyPeer;
 
     private String getOrigin() {
         return getPackageName();
@@ -50,26 +53,45 @@ public class MainActivity extends AppCompatActivity {
                 mToken = uriStr.substring(uriStr.indexOf("#") + 1);
 
                 connectWAMP();
-/*
-                String param1 = uri.getQueryParameter("code");
-
-                //さっき送り出したcodeと合っていれば任意の処理を入れます
-                if(param1.equals(code)){
-                }
-                */
             }
         }
     }
 
     private void connectWAMP() {
         mWampTransport = new WampWebSocketTransport();
-        mWampProxyPeer = new ProxyPeer(mWampTransport);
         mWampTransport.setOnWampMessageListener(new WampWebSocketTransport.OnWampMessageListener() {
 
             @Override
             public void onMessage(WampMessage msg) {
-                //proxyPeer.transmit(msg);
-                System.out.println(msg);
+                switch( msg.getMessageType() ){
+                    case WampMessageType.WELCOME :
+                        // 機器一覧を問い合わせるメッセージを送ります。
+                        mWampTransport.send(WampMessageFactory.createCall(WampRequestIdGenerator.getId(),new JSONObject()
+                                ,"com.sonycsl.kadecot.provider.procedure.getDeviceList")) ;
+                        break ;
+                    case WampMessageType.RESULT:
+                        WampResultMessage wrm = msg.asResultMessage() ;
+
+                        JSONObject arg = wrm.getArgumentsKw() ;
+
+                        // argの内部構造は、どんな呼び出しに対する返答かによって異なります。
+                        // この例では、getDeviceListの返答が来たと仮定して、機器一覧を得るようにしています。
+                        // (それしか送っていないので）
+                        // 様々なリクエストを行い、様々な返答が返ってくるときは、wrm.getRequestId()によって
+                        // IDを得て、どの呼び出しに対する返答かというのを調べるようにしてください。
+
+                        try {
+                            JSONArray devs = null;
+                            devs = arg.getJSONArray("deviceList");
+                            for( int di=0 ; di<devs.length() ; ++di ){
+                                JSONObject dev = devs.getJSONObject(di) ;
+                                System.out.println( dev.getInt("deviceId")+":"+dev.getString("protocol")+"/"+dev.getString("deviceType")) ;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        break ;
+                }
             }
 
             @Override
