@@ -50,15 +50,15 @@ redirect_uriが、OAuth後に戻ってくるuriとなります。他のkadecot�
 
 6.アプリにwamp.jarとjava_websocket.jarをリンクします。
 
-7. WebSocket/WAMPでKadecotでつなぐためのトランスポートオブジェクトWampWebSocketTransportのインスタンスを作り、メッセージの授受をするためのリスナーWampWebSocketTransport.OnWampMessageListenerを設定した上でopen()で接続します。
+7.WebSocket/WAMPでKadecotでつなぐためのトランスポートオブジェクトWampWebSocketTransportのインスタンスを作り、メッセージの授受をするためのリスナーWampWebSocketTransport.OnWampMessageListenerを設定した上でopen()で接続します。
 
 接続先はlocalhost(同一端末内のため）、ポートは41314、originとして"kadecot://"+context.getPackageName()、最後の引数に先ほど得られたトークンを入れます。
 
-mWampTransport.open("localhost", 41314, "kadecot://" + getPackageName(), mToken);
+mWampTransport.open("localhost", 41314, "kadecot://" + context.getPackageName(), mToken);
 
-8. WAMPの規約に従い、HELLOメッセージを送ります。WAMPのメッセージはWampMessageFactory.create****で作れます。****はWAMPのメッセージの種類の数だけ存在します。
+8.WAMPの規約に従い、HELLOメッセージを送ります。WAMPのメッセージはWampMessageFactory.create****で作れます。****はWAMPのメッセージの種類の数だけ存在します。
 
         mWampTransport.send(WampMessageFactory.createHello("realm", new JSONObject()));
 
-9. 返答は先程設定したリスナーのonMessage()で受け取ります。受け取ったメッセージの処理についてはMainActivity.javaを参照してください。
+9.返答は先程設定したリスナーのonMessage()で受け取ります。受け取ったメッセージの処理についてはMainActivity.javaを参照してください。
 この例では、最初のHELLOの返答としてWELCOMEが返ってきたら、機器一覧を問い合わせるCALLを送信し、その返答のRESULTメッセージで機器ごとに情報を表示するようにしています。
