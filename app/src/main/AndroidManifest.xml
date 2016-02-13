@@ -27,11 +27,12 @@
             </intent-filter>
 
             <!-- カスタムuriスキームを作るため、以下のintent-filterを追加します -->
+            <!-- data android:hostに固有のパッケージ名を入れてください。 -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="kadecot" />
+                <data android:scheme="kadecot" android:host="com.sonycsl.kadecotoauthandroidsample" />
             </intent-filter>
 
         </activity>

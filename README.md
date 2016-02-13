@@ -22,12 +22,13 @@ OAuth時の流れとしては、まず、OAuth用のブラウザを立ち上げ�
 1.OAuthの返答を受け取るactivityの属性に、singleTaskを追加します。(OAuthから戻ってきたときに、Activityが二重起動することを避けるため）
 
 2.このactivity内に、次のintent-filterを追加し、カスタムuriスキームkadecotを作ります。
+　<data>タグ内に android:host属性としてパッケージ名を入れるようにしてください。
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="kadecot" />
+                <data android:scheme="kadecot" android:host="com.sonycsl.kadecotoauthandroidsample" />
             </intent-filter>
 
 3.結果を受け取るactivityのソースコードでは、onNewIntent内でsetIntentしておいてください。
@@ -39,7 +40,7 @@ OAuth時の流れとしては、まず、OAuth用のブラウザを立ち上げ�
 redirect_uriが、OAuth後に戻ってくるuriとなります。他のkadecot対応アプリとの干渉を避けるため、ホスト名としては、必ずアプリのパッケージ名を入れるようにしてください。このパッケージ名は、のちほどWebSocketで通信する際のoriginとしても使われます（一致していなければなりません）
 
 5.OAuthの結果はonResumeで受け取ります。getIntent().getData()するとUriオブジェクトが返ってきます。
-この#以降がアクセストークンです。
+この#以降がアクセストークンです。このサンプルではトークンは変数に格納されているだけなので、アプリが再起動されると消えてしまいますが、Preferenceなどに保存しておけば、Kadecotのデータがクリアされない限りは次回以降も使えます。
 
 ## WAMPでのアクセス
 
